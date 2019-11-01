@@ -80,8 +80,8 @@ function modelChange = mcmc_10times(modelfile, condition, target_rxn, flux_range
 %
 % .. Author: - Gyu Min Lee 10/31/19
 
-    %initCobraToolbox;
-    %changeCobraSolver('ibm_cplex', 'all');
+    initCobraToolbox;
+    changeCobraSolver('ibm_cplex', 'all');
     [~,name,~] = fileparts(modelfile);
     model = readCbModel(modelfile);
     
