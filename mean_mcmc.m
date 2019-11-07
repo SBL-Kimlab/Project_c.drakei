@@ -49,7 +49,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                 check_sampling = dir (strcat(name, '_', target_rxn, '_flux_', num2str(flux), '*.mat'));
                 count_sampling = size(check_sampling);
                 
-                if count_sampling(1) ~= 2
+                if count_sampling(1) ~= 10
                     warning (sprintf ('%s : flux %s .... NOT finished 10 times.\nend',  target_rxn, num2str(flux)));
                 else
                     fprintf('%s : flux %s .... finished 10 times\nNow making average ....\n',  target_rxn, num2str(flux))
@@ -71,7 +71,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
         elseif strcmp(target_rxn, 'wt')
             check_sampling = dir (strcat(name, '_', target_rxn, '_', '*.mat')); 
             count_sampling = size(check_sampling);
-            if count_sampling(1) ~= 2
+            if count_sampling(1) ~= 10
                 warning (sprintf ('%s .... NOT finished 10 times.\nend',  target_rxn));
             else
                 fprintf('%s .... finished 10 times\nNow making average ....\n',  target_rxn)
@@ -157,7 +157,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
                 modelChange = changeRxnBounds( modelChange, target_rxn, flux, 'b');
                 fba = optimizeCbModel(modelChange);
                 modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
-                for time = 1:2
+                for time = 1:10
                     resultfile = strcat(name, '_', target_rxn, '_flux_', num2str(flux), '_', num2str(time), '.mat'); 
                     if ~isfile(resultfile)                
                         try
@@ -182,7 +182,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 
             fba = optimizeCbModel(modelChange);
             modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
-            for time = 1:2
+            for time = 1:10
                 resultfile = strcat(name, '_', target_rxn, '_', num2str(time), '.mat'); 
                 if ~isfile(resultfile)                
                     try
