@@ -1,6 +1,6 @@
-% Gyu Min Lee: 31 oct 19
-
-dir_base = 'D:\Google_Drive_Backup\용량부족해\##Project\13.drakei_revision\TEST\';
+% Gyu Min Lee: 07 nov 19
+clc
+dir_base = 'D:\Google_Drive_Backup\용량부족해\##Project\13.drakei_revision\Sampling_matlab\';
 modelfile = 'D:\Google_Drive_Backup\용량부족해\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
 genedata = 'D:\Google_Drive_Backup\용량부족해\##Project\13.drakei_revision\GIMME\Cdrakei_gene_expression.txt';
 %%
@@ -9,9 +9,7 @@ integrated_model = GIMME_model(modelfile, genedata, dir_base);
 %%
 % do 10times of 2,000 sampling and average them
 condition = ["auto"];
-target_rxn = ["FDH7", "FTHFLi", "MTHFC", "MTHFD", "MTHFR5", "METR", "CODH_ACS", "GLYCL", "GLYR"];
-flux_range = 0 : 0.1 : 5;
+arrayt_rxn = ["wt", "FDH7", "FTHFLi", "MTHFC", "MTHFD", "MTHFR5", "METR", "CODH_ACS", "GLYCL", "GLYR"]; %wt; no change in flux(wild type)
+flux_range = 1.1 : 0.1 : 1.1;
 clc
-for rxn = target_rxn
-    mean_mcmc(integrated_model, condition, rxn, flux_range, dir_base);
-end
+mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
