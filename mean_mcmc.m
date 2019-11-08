@@ -20,18 +20,17 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
 %     dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
 % 
 %     condition = ["auto"];
-%     array_rxn = ["wt", "FDH7", "FTHFLi", "MTHFC", "MTHFD", "MTHFR5", "METR", "CODH_ACS", "GLYCL", "GLYR"];
+%     array_rxn = ["wt", "FDH8", "FTHFLi", "MTHFC", "MTHFD", "MTHFR5", "METR", "CODH_ACS", "GLYCL", "GLYR"];
 %     flux_range = 0 : 0.1 : 5;
 %     clc
 %     mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/06/19
+% .. Author: - Gyu Min Lee 11/07/19
 
     modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base);
     
     [~,name,~] = fileparts(modelfile);
     merge_sampling = [];
-
     
     for target_rxn = array_rxn
         dir_condition = strcat(dir_base, condition, 'trophic');
@@ -111,10 +110,17 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 % OUTPUTS:
 %   modelChange:    Flux changed model used in smapling, providing a lower bound of 95% of the optimal growth rate as computed by FBA
 %
-% .. Author: - Gyu Min Lee 11/06/19
+% EXAMPLES:
+%   modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
+%   dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
+%   genedata = 'D:\##Project\13.drakei_revision\GIMME\Cdrakei_gene_expression.txt';
+%
+%   integrated_model = GIMME_model(modelfile, genedata, dir_base);
+%
+% .. Author: - Gyu Min Lee 11/08/19
 
-    %initCobraToolbox;
-    %changeCobraSolver('ibm_cplex', 'all');
+    initCobraToolbox;
+    changeCobraSolver('ibm_cplex', 'all');
     [~,name,~] = fileparts(modelfile);
     model = readCbModel(modelfile);
     
@@ -184,7 +190,8 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
             modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
             for time = 1:10
                 resultfile = strcat(name, '_', target_rxn, '_', num2str(time), '.mat'); 
-                if ~isfile(resultfile)                
+                try
+                    ~isfile(resultfile);             
                     try
                         warning('off')
                         [ ~,samples ] = sampleCbModel( modelChange );
@@ -196,7 +203,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
                         warning('on')
                         warning (sprintf ('%s : %s time ....NOT operate.',  target_rxn, num2str(time)));
                     end
-                else
+                catch
                     fprintf ('%s ....Already exist.\n\n',  resultfile);            
                 end
             end
