@@ -55,5 +55,7 @@ function resultfile = GIMME_model(modelfile, genedata, dir_base)
         save(resultfile, 'integrated_model')
         fprintf ('%s ....Saved.\n\n',  resultfile);    
     else
-        fprintf ('%s ....Already exist.\n\n',  resultfile);  
+        fprintf ('%s ....Already exist.\n\n',  resultfile);
+    end
+    cd (dir_base)
 end    
