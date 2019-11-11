@@ -1,4 +1,4 @@
-function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base)
+function mean_sampling = mean_mcmc5(modelfile, condition, array_rxn, flux_range, dir_base)
 % Make structure with mean of MCMC sampling and name of reactions.
 %
 % USAGE:
@@ -25,7 +25,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
 %     clc
 %     mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/07/19
+% .. Author: - Gyu Min Lee 11/11/19
 
     modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base);
     
@@ -45,6 +45,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
 
         if ~strcmp(target_rxn, 'wt')
             for flux = flux_range
+                cd (dir_result)
                 check_sampling = dir (strcat(name, '_', target_rxn, '_flux_', num2str(flux), '*.mat'));
                 count_sampling = size(check_sampling);
                 
@@ -52,6 +53,38 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                     warning (sprintf ('%s : flux %s .... NOT finished 10 times.\nend',  target_rxn, num2str(flux)));
                 else
                     fprintf('%s : flux %s .... finished 10 times\nNow making average ....\n',  target_rxn, num2str(flux))
+                    meanfile = strcat('mean_', name, '_', target_rxn, '_flux_', num2str(flux), '.mat');
+                    cd (dir_mean)
+                    if ~isfile (meanfile)
+                        cell_samplingFiles = struct2cell(check_sampling);
+                        cell_samplingFiles = {cell_samplingFiles{1, :}};
+                        for resultfile = cell_samplingFiles
+                            load (string(resultfile));
+                            merge_sampling = horzcat(merge_sampling, samples);
+                        end
+                        mean_sampling = mean(merge_sampling, 2);
+                        mean_sampling = struct('mean', mean_sampling);
+                        [mean_sampling(:).rxns] = modelChange.rxns;
+
+                        save(strcat(dir_mean, meanfile), 'mean_sampling');
+                        fprintf ('%s ....Saved.\n\n',  meanfile);
+                    else
+                        fprintf ('%s ....Already exist.\n\n',  meanfile);                        
+                    end    
+                end
+            end
+            
+        elseif strcmp(target_rxn, 'wt')
+            cd (dir_result)
+            check_sampling = dir (strcat(name, '_', target_rxn, '_', '*.mat')); 
+            count_sampling = size(check_sampling);
+            if count_sampling(1) ~= 10
+                warning (sprintf ('%s .... NOT finished 10 times.\nend',  target_rxn));
+            else
+                fprintf('%s .... finished 10 times\nNow making average ....\n',  target_rxn)
+                cd (dir_mean)
+                meanfile = strcat('mean_', name, '_', target_rxn, '.mat');
+                if ~isfile (meanfile)
                     cell_samplingFiles = struct2cell(check_sampling);
                     cell_samplingFiles = {cell_samplingFiles{1, :}};
                     for resultfile = cell_samplingFiles
@@ -61,31 +94,12 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                     mean_sampling = mean(merge_sampling, 2);
                     mean_sampling = struct('mean', mean_sampling);
                     [mean_sampling(:).rxns] = modelChange.rxns;
-                    meanfile = strcat('mean_', name, '_', target_rxn, '_flux_', num2str(flux), '.mat');
+
                     save(strcat(dir_mean, meanfile), 'mean_sampling');
                     fprintf ('%s ....Saved.\n\n',  meanfile);
-                end    
-            end
-            
-        elseif strcmp(target_rxn, 'wt')
-            check_sampling = dir (strcat(name, '_', target_rxn, '_', '*.mat')); 
-            count_sampling = size(check_sampling);
-            if count_sampling(1) ~= 10
-                warning (sprintf ('%s .... NOT finished 10 times.\nend',  target_rxn));
-            else
-                fprintf('%s .... finished 10 times\nNow making average ....\n',  target_rxn)
-                cell_samplingFiles = struct2cell(check_sampling);
-                cell_samplingFiles = {cell_samplingFiles{1, :}};
-                for resultfile = cell_samplingFiles
-                    load (string(resultfile));
-                    merge_sampling = horzcat(merge_sampling, samples);
+                else
+                    fprintf ('%s ....Already exist.\n\n',  meanfile);
                 end
-                mean_sampling = mean(merge_sampling, 2);
-                mean_sampling = struct('mean', mean_sampling);
-                [mean_sampling(:).rxns] = modelChange.rxns;
-                meanfile = strcat('mean_', name, '_', target_rxn, '.mat');
-                save(strcat(dir_mean, meanfile), 'mean_sampling');
-                fprintf ('%s ....Saved.\n\n',  meanfile);
             end
         end
     end
