@@ -1,4 +1,4 @@
-function mean_sampling = mean_mcmc5(modelfile, condition, array_rxn, flux_range, dir_base)
+function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base)
 % Make structure with mean of MCMC sampling and name of reactions.
 %
 % USAGE:
