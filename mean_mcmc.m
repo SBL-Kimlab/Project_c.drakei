@@ -59,6 +59,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                         cell_samplingFiles = struct2cell(check_sampling);
                         cell_samplingFiles = {cell_samplingFiles{1, :}};
                         for resultfile = cell_samplingFiles
+                            cd (dir_result)
                             load (string(resultfile));
                             merge_sampling = horzcat(merge_sampling, samples);
                         end
@@ -66,6 +67,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                         mean_sampling = struct('mean', mean_sampling);
                         [mean_sampling(:).rxns] = modelChange.rxns;
 
+                        cd (dir_mean)
                         save(strcat(dir_mean, meanfile), 'mean_sampling');
                         fprintf ('%s ....Saved.\n\n',  meanfile);
                     else
