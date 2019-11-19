@@ -1,4 +1,4 @@
-function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base)
+function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range, dir_base)
 % Make structure with mean of MCMC sampling and name of reactions.
 %
 % USAGE:
@@ -14,6 +14,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
 %
 % OUTPUTS:
 %   mean_sampling:      Structure with mean of MCMC sampling and name of reactions.
+%   xlsxfile:          excel file with name of reactions and sampling value to parse
 %
 % EXAMPLES:
 %     modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
@@ -25,7 +26,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
 %     clc
 %     mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/11/19
+% .. Author: - Gyu Min Lee 11/19/19
 
     modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base);
     
@@ -54,6 +55,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                 else
                     fprintf('%s : flux %s .... finished 10 times\nNow making average ....\n',  target_rxn, num2str(flux))
                     meanfile = strcat('mean_', name, '_', target_rxn, '_flux_', num2str(flux), '.mat');
+                    xlsxfile = strcat('mean_', name, '_', target_rxn, '_flux_', num2str(flux), '.xlsx');
                     cd (dir_mean)
                     if ~isfile (meanfile)
                         cell_samplingFiles = struct2cell(check_sampling);
@@ -70,8 +72,21 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                         cd (dir_mean)
                         save(strcat(dir_mean, meanfile), 'mean_sampling');
                         fprintf ('%s ....Saved.\n\n',  meanfile);
+                        merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
+                        merge_mean_sampling = flip(merge_mean_sampling, 2);
+                        writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                        fprintf ('%s ....Saved.\n\n',  xlsxfile);
                     else
-                        fprintf ('%s ....Already exist.\n\n',  meanfile);                        
+                        fprintf ('%s ....Already exist.\n',  meanfile);
+                        if ~isfile(xlsxfile)
+                            load(meanfile);
+                            merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
+                            merge_mean_sampling = flip(merge_mean_sampling, 2);
+                            writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                            fprintf ('%s ....Saved.\n\n',  xlsxfile);
+                        else
+                            fprintf ('%s ....Already exist.\n\n',  xlsxfile);
+                        end           
                     end    
                 end
             end
@@ -86,6 +101,7 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                 fprintf('%s .... finished 10 times\nNow making average ....\n',  target_rxn)
                 cd (dir_mean)
                 meanfile = strcat('mean_', name, '_', target_rxn, '.mat');
+                xlsxfile = strcat('mean_', name, '_', target_rxn, '.xlsx');
                 if ~isfile (meanfile)
                     cell_samplingFiles = struct2cell(check_sampling);
                     cell_samplingFiles = {cell_samplingFiles{1, :}};
@@ -98,14 +114,29 @@ function mean_sampling = mean_mcmc(modelfile, condition, array_rxn, flux_range, 
                     [mean_sampling(:).rxns] = modelChange.rxns;
 
                     save(strcat(dir_mean, meanfile), 'mean_sampling');
-                    fprintf ('%s ....Saved.\n\n',  meanfile);
+                    fprintf ('%s ....Saved.\n',  meanfile);
+                    merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
+                    merge_mean_sampling = flip(merge_mean_sampling, 2);
+                    writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                    fprintf ('%s ....Saved.\n\n',  xlsxfile);
+                    
                 else
-                    fprintf ('%s ....Already exist.\n\n',  meanfile);
+                    fprintf ('%s ....Already exist.\n',  meanfile);
+                    if ~isfile(xlsxfile)
+                        load(meanfile);
+                        merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
+                        merge_mean_sampling = flip(merge_mean_sampling, 2);
+                        writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                        fprintf ('%s ....Saved.\n\n',  xlsxfile);
+                    else
+                        fprintf ('%s ....Already exist.\n\n',  xlsxfile);                    
+                    end
                 end
             end
         end
     end
 end
+
 
 
 function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base)
