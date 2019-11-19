@@ -14,7 +14,8 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range,
 %
 % OUTPUTS:
 %   mean_sampling:      Structure with mean of MCMC sampling and name of reactions.
-%   xlsxfile:          excel file with name of reactions and sampling value to parse
+%   xlsxfile:           excel file containing name of reactions, sampling
+%                       values, and sampling values normalized with biomass value
 %
 % EXAMPLES:
 %     modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
@@ -72,18 +73,34 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range,
                         cd (dir_mean)
                         save(strcat(dir_mean, meanfile), 'mean_sampling');
                         fprintf ('%s ....Saved.\n\n',  meanfile);
-                        merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
-                        merge_mean_sampling = flip(merge_mean_sampling, 2);
+                        
+                        nmean = size(mean_sampling.mean, 1);
+                        norm_mean = zeros(nmean, 1);
+                        idx_biomass = find(modelChange.c);
+                        value_biomass = mean_sampling.mean(idx_biomass);
+                        for i = 1 : nmean
+                            norm_mean(i, 1) = mean_sampling.mean(i, 1) / value_biomass;
+                            norm_mean(i, 1) = round(norm_mean(i, 1), 5);
+                        end
+                        merge_mean_sampling = [mean_sampling.rxns, num2cell(mean_sampling.mean), num2cell(norm_mean)];
                         writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
                         fprintf ('%s ....Saved.\n\n',  xlsxfile);
                     else
                         fprintf ('%s ....Already exist.\n',  meanfile);
                         if ~isfile(xlsxfile)
                             load(meanfile);
-                            merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
-                            merge_mean_sampling = flip(merge_mean_sampling, 2);
-                            writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
-                            fprintf ('%s ....Saved.\n\n',  xlsxfile);
+
+                        nmean = size(mean_sampling.mean, 1);
+                        norm_mean = zeros(nmean, 1);
+                        idx_biomass = find(modelChange.c);
+                        value_biomass = mean_sampling.mean(idx_biomass);
+                        for i = 1 : nmean
+                            norm_mean(i, 1) = mean_sampling.mean(i, 1) / value_biomass;
+                            norm_mean(i, 1) = round(norm_mean(i, 1), 5);
+                        end
+                        merge_mean_sampling = [mean_sampling.rxns, num2cell(mean_sampling.mean), num2cell(norm_mean)];
+                        writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                        fprintf ('%s ....Saved.\n\n',  xlsxfile);                 
                         else
                             fprintf ('%s ....Already exist.\n\n',  xlsxfile);
                         end           
@@ -115,19 +132,32 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range,
 
                     save(strcat(dir_mean, meanfile), 'mean_sampling');
                     fprintf ('%s ....Saved.\n',  meanfile);
-                    merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
-                    merge_mean_sampling = flip(merge_mean_sampling, 2);
+                    nmean = size(mean_sampling.mean, 1);
+                    norm_mean = zeros(nmean, 1);
+                    idx_biomass = find(modelChange.c);
+                    value_biomass = mean_sampling.mean(idx_biomass);
+                    for i = 1 : nmean
+                        norm_mean(i, 1) = mean_sampling.mean(i, 1) / value_biomass;
+                        norm_mean(i, 1) = round(norm_mean(i, 1), 5);
+                    end
+                    merge_mean_sampling = [mean_sampling.rxns, num2cell(mean_sampling.mean), num2cell(norm_mean)];
                     writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
                     fprintf ('%s ....Saved.\n\n',  xlsxfile);
-                    
                 else
                     fprintf ('%s ....Already exist.\n',  meanfile);
                     if ~isfile(xlsxfile)
                         load(meanfile);
-                        merge_mean_sampling = [num2cell(mean_sampling.mean), mean_sampling.rxns];
-                        merge_mean_sampling = flip(merge_mean_sampling, 2);
-                        writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
-                        fprintf ('%s ....Saved.\n\n',  xlsxfile);
+                    nmean = size(mean_sampling.mean, 1);
+                    norm_mean = zeros(nmean, 1);
+                    idx_biomass = find(modelChange.c);
+                    value_biomass = mean_sampling.mean(idx_biomass);
+                    for i = 1 : nmean
+                        norm_mean(i, 1) = mean_sampling.mean(i, 1) / value_biomass;
+                        norm_mean(i, 1) = round(norm_mean(i, 1), 5);
+                    end
+                    merge_mean_sampling = [mean_sampling.rxns, num2cell(mean_sampling.mean), num2cell(norm_mean)];
+                    writecell(merge_mean_sampling, xlsxfile, 'Sheet', 1, 'Range', 'A1')
+                    fprintf ('%s ....Saved.\n\n',  xlsxfile);
                     else
                         fprintf ('%s ....Already exist.\n\n',  xlsxfile);                    
                     end
