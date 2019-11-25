@@ -1,13 +1,15 @@
-function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range, dir_base)
-% Make structure with mean of MCMC sampling and name of reactions.
+function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base)
+% Make structure with mean of MCMC sampling and name of reactions and will
+% make .xlsx file with original sampling values and the values normalized
+% with Biomass value.
 %
 % USAGE:
-%   mean_sampling = mean_mcmc2(modelfile, condition, target_rxn, flux_range, dir_base)
+%   mean_sampling = mean_mcmc(modelfile, condition, target_rxn, flux_range, dir_base)
 %
 % INPUTS:
 %   modelfile:          COBRA model file with available format
 %   condition:          {'auto', 'hetero'} Condition of the model
-%   target_rxn:         String array of reactions to change flux
+%   array_rxn:         String array of reactions to change flux
 %   flux_range:         Array of the range of flux you want to use, if you set target_rxn
 %                       as 'wt', flux_range wll not give any influence.
 %   dir_base:           Root of base folder you want to save the result files
@@ -15,7 +17,7 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range,
 % OUTPUTS:
 %   mean_sampling:      Structure with mean of MCMC sampling and name of reactions.
 %   xlsxfile:           excel file containing name of reactions, sampling
-%                       values, and sampling values normalized with biomass value
+%                       values, and sampling values normalized with Biomass value
 %
 % EXAMPLES:
 %     modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
@@ -27,7 +29,7 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, array_rxn, flux_range,
 %     clc
 %     mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/19/19
+% .. Author: - Gyu Min Lee 11/25/19
 
     modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base);
     
@@ -179,7 +181,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 % INPUTS:
 %   modelfile:      COBRA model file with available format
 %   condition:      {'auto', 'hetero'} Condition of the model
-%   target_rxn:     String array of reactions to change flux (wild type; 'wt')
+%   array_rxn:     String array of reactions to change flux (wild type; 'wt')
 %   flux_range:     Array of the range of flux you want to use, if you set target_rxn
 %                   as 'wt', flux_range wll not give any influence.
 %   dir_base:       Root of base folder you want to save the result files
@@ -194,7 +196,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 %
 %   integrated_model = GIMME_model(modelfile, genedata, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/08/19
+% .. Author: - Gyu Min Lee 11/25/19
 
     initCobraToolbox;
     changeCobraSolver('ibm_cplex', 'all');
@@ -267,8 +269,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
             modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
             for time = 1:10
                 resultfile = strcat(name, '_', target_rxn, '_', num2str(time), '.mat'); 
-                try
-                    ~isfile(resultfile);             
+                if ~isfile(resultfile)             
                     try
                         warning('off')
                         [ ~,samples ] = sampleCbModel( modelChange );
@@ -280,7 +281,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
                         warning('on')
                         warning (sprintf ('%s : %s time ....NOT operate.',  target_rxn, num2str(time)));
                     end
-                catch
+                else
                     fprintf ('%s ....Already exist.\n\n',  resultfile);            
                 end
             end
