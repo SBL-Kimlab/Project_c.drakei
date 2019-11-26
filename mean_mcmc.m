@@ -176,7 +176,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 % condition of model and bounds of reaction.
 %
 % USAGE:
-%    modelChange = mcmc_10times(modelfile, condition, target_rxn, flux_range, dir_base)
+%    modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base)
 %
 % INPUTS:
 %   modelfile:      COBRA model file with available format
@@ -189,14 +189,7 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
 % OUTPUTS:
 %   modelChange:    Flux changed model used in smapling, providing a lower bound of 95% of the optimal growth rate as computed by FBA
 %
-% EXAMPLES:
-%   modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
-%   dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
-%   genedata = 'D:\##Project\13.drakei_revision\GIMME\Cdrakei_gene_expression.txt';
-%
-%   integrated_model = GIMME_model(modelfile, genedata, dir_base);
-%
-% .. Author: - Gyu Min Lee 11/25/19
+% .. Author: - Gyu Min Lee 11/26/19
 
     initCobraToolbox;
     changeCobraSolver('ibm_cplex', 'all');
@@ -235,16 +228,17 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
         modelChange = model;
     
         if ~strcmp(target_rxn, 'wt')
-            fprintf ('%s in %strophic condition, %s flux from %s to %s ....operating\n\n', name, condition, ...
+            fprintf ('%s, %s flux from %s to %s ....operating\n\n', name, ...
             target_rxn, num2str(flux_range(1,1)), num2str(flux_range(1,end)));
-
+            
             for flux = flux_range
-                modelChange = changeRxnBounds( modelChange, target_rxn, flux, 'b');
-                fba = optimizeCbModel(modelChange);
-                modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
-                for time = 1:10
-                    resultfile = strcat(name, '_', target_rxn, '_flux_', num2str(flux), '_', num2str(time), '.mat'); 
-                    if ~isfile(resultfile)                
+                resultfile = strcat(name, '_', target_rxn, '_flux_', num2str(flux), '_', num2str(time), '.mat'); 
+                
+                if ~isfile(resultfile)    
+                    modelChange = changeRxnBounds( modelChange, target_rxn, flux, 'b');
+                    fba = optimizeCbModel(modelChange);
+                    modelChange = changeRxnBounds(modelChange, 'BiomassSynthesis', 0.95 * fba.f, 'l');
+                    for time = 1:10                                
                         try
                             warning('off')
                             [ ~,samples ] = sampleCbModel( modelChange );
@@ -256,20 +250,20 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
                             warning('on')
                             warning (sprintf ('%s : flux %s, %s time ....NOT operate.',  target_rxn, num2str(flux), num2str(time)));
                         end
-                    else
-                        fprintf ('%s ....Already exist.\n\n',  resultfile);            
                     end
+                else
+                    fprintf ('%s ....Already exist.\n\n',  resultfile);            
                 end
             end
 
         elseif strcmp(target_rxn, 'wt')
-            fprintf ('%s in %strophic condition, %s ....operating\n\n', name, condition, target_rxn);
+            fprintf ('%s, %s ....operating\n\n', name, target_rxn);
 
             fba = optimizeCbModel(modelChange);
-            modelChange = changeRxnBounds(modelChange, 'BIOMASS_Cdrakei_SLT1', 0.95 * fba.f, 'l');
+            modelChange = changeRxnBounds(modelChange, 'BiomassSynthesis', 0.95 * fba.f, 'l');
             for time = 1:10
                 resultfile = strcat(name, '_', target_rxn, '_', num2str(time), '.mat'); 
-                if ~isfile(resultfile)             
+                if ~isfile(resultfile)
                     try
                         warning('off')
                         [ ~,samples ] = sampleCbModel( modelChange );
@@ -287,4 +281,4 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
             end
         end
     end
-end    
+end  
