@@ -20,7 +20,7 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, condition, array_rxn, 
 %                       values, and sampling values normalized with Biomass value
 %
 % EXAMPLES:
-%     modelfile = 'D:\##Project\13.drakei_revision\iSL_V3.3_http_2_cobrapy.mat';
+%     modelfile = 'D:\##Project\13.drakei_revision\iSL711.mat';
 %     dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
 % 
 %     condition = ["auto"];
@@ -29,7 +29,7 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, condition, array_rxn, 
 %     clc
 %     mean_mcmc(modelfile, condition, array_rxn, flux_range, dir_base);
 %
-% .. Author: - Gyu Min Lee 11/25/19
+% .. Author: - Gyu Min Lee 11/29/19
 
     modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range, dir_base);
     
