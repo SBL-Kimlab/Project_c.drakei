@@ -20,7 +20,7 @@ function [mean_sampling, xlsxfile] = mean_mcmc(modelfile, condition, array_rxn, 
 %                       values, and sampling values normalized with Biomass value
 %
 % EXAMPLES:
-%     modelfile = 'D:\##Project\13.drakei_revision\iSL711.mat';
+%     modelfile = 'D:\##Project\13.drakei_revision\iSL771.mat';
 %     dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
 % 
 %     condition = ["auto"];

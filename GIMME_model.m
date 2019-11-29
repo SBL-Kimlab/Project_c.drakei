@@ -13,7 +13,7 @@ function resultfile = GIMME_model(modelfile, genedata, dir_base)
 %   resultfile:         full path of the integrated model
 %
 % EXAMPLES:
-%     modelfile = 'D:\##Project\13.drakei_revision\iSL711.mat';
+%     modelfile = 'D:\##Project\13.drakei_revision\iSL771.mat';
 %     dir_base = 'D:\##Project\13.drakei_revision\MCMC\';
 %     genedata = 'GIMME\Cdrakei_gene_expression.txt';
 % 
