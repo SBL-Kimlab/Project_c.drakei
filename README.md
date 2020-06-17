@@ -16,3 +16,6 @@ There are 3 .m files.
    of model and bounds of reaction.
    After that, it will make structure with average of MCMC sampling and name of reactions.
    A xlsx file with original sampling values and the values normalized with Biomass value will be saved.
+   
+These code were introduced in https://www.pnas.org/content/117/13/7516, "Functional cooperation of the 
+glycine synthase-reductase and Wood–Ljungdahl pathways for autotrophic growth of Clostridium drakei".
