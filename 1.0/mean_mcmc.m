@@ -210,10 +210,8 @@ function modelChange = mcmc_10times(modelfile, condition, array_rxn, flux_range,
             model = changeRxnBounds( model, 'EX_h2_e', 0, 'l' );
             model = changeRxnBounds( model, 'EX_co2_e', 0, 'l' );
             model = changeRxnBounds( model, 'EX_fru_e', -2.224, 'l' );
-        otherwise
-            model = model;         
+            
     end
-    
     dir_condition = strcat(dir_base, condition, 'trophic');
     if ~exist (dir_condition, 'dir')
         mkdir(dir_condition)
