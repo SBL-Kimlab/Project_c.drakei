@@ -1,6 +1,6 @@
 #  averageAfterSampling
 
-## Matlab code files to get average of 100,000 MCMC samplings with CHRR algorithm
+Matlab code files to get average of 100,000 MCMC samplings with CHRR algorithm
 
 ## Description of Matlab code files
 
